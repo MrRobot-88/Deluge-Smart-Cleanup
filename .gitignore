@@ -1,0 +1,11 @@
+deluge-smart-cleanup-state.json
+*.state.json
+*.log
+.env
+*.key
+*-key
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.idea/
