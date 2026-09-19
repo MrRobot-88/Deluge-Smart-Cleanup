@@ -65,6 +65,12 @@ Run the script periodically, such as once per day. Keep real passwords and other
 
 ## AutoRemovePlus
 
+### Download the fixed plugin
+
+**[Download AutoRemovePlus-2.0.0-py3.12.egg](autoremoveplus/AutoRemovePlus-2.0.0-py3.12.egg)**
+
+For Deluge running on **Python 3.12**. Download the `.egg`, add it through Deluge's **Preferences → Plugins → Install Plugin**, then enable AutoRemovePlus.
+
 This repository also includes a tested **AutoRemovePlus 2.0.0 Python 3.12** build.
 
 The older `.egg` was incompatible with the newer Deluge environment used during testing. That compatibility problem was fixed and the resulting build was tested successfully.
