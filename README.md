@@ -1,46 +1,42 @@
 # Deluge Smart Cleanup
 
-Safe, conservative torrent cleanup for **Deluge**, with documentation for **Gluetun** and an optional tested **AutoRemovePlus** workflow.
+A small, safety-first cleanup tool for **Deluge**. It handles torrents that get stuck before finishing and can be used alongside **AutoRemovePlus** for completed torrents.
 
-This project complements:
+Works with a normal Deluge setup. **Gluetun, Sonarr, Radarr and Prowlarr are optional.**
+
+Related projects:
 - https://github.com/MrRobot-88/Sonarr-Smart-Optimizer
 - https://github.com/MrRobot-88/Radarr-Smart-Optimizer
 
-## What this project is for
+## What does it do?
 
-There are two different cleanup jobs:
+There are two cleanup jobs:
 
-1. **Completed torrents / seeding retention** — AutoRemovePlus can keep completed torrents for a configured seed time and then remove the torrent and its download data.
-2. **Dead or stuck incomplete torrents** — `deluge-smart-cleanup.py` tracks incomplete torrents over time and can remove torrents that remain inactive for a configured number of days.
+- **Stuck incomplete torrents:** `deluge-smart-cleanup.py` remembers torrent activity between runs. If an incomplete torrent stays inactive for the configured number of days, it becomes eligible for removal.
+- **Completed torrents:** AutoRemovePlus can keep them seeding for a set time and remove them afterward.
 
-They are deliberately separate. The smart-cleanup script does **not** replace AutoRemovePlus.
+Keeping these jobs separate makes the behavior easier to understand and safer to control.
 
-## Setup used during development
+## Safety first
 
-The setup this project was developed around was:
+Smart Cleanup starts in **dry-run mode**. It only shows what it *would* remove.
 
-`Prowlarr -> Sonarr/Radarr -> Deluge -> Gluetun`
+Nothing is removed unless you run it with `--live`.
 
-Prowlarr and Gluetun are **not required** by the cleanup script. Sonarr/Radarr can use any supported indexer setup. Gluetun is simply the VPN/network layer used for Deluge in the tested setup.
+By default:
+- inactivity must last **11 days**
+- only torrents below **100%** are considered
+- download or upload activity resets the timer
+- completed torrents are ignored by Smart Cleanup
+- state is saved locally between runs
 
-## Safety
+Always check the dry-run output before enabling live deletion.
 
-- Smart Cleanup is **DRY RUN by default**.
-- Actual removal requires `--live`.
-- Default inactivity threshold is **11 days**.
-- Only incomplete torrents below 100% are candidates for stuck cleanup.
-- A torrent showing download/upload activity resets its inactivity timer.
-- State is stored locally so inactivity is measured across runs.
-- Completed torrents are left to AutoRemovePlus rather than being deleted by Smart Cleanup.
-- Configuration is via environment variables; no API keys, NAS paths or tracker names are built in.
+## Quick start
 
-Always run dry mode and inspect the output before enabling live deletion.
+Requirements: **Python 3.8+** and a reachable **Deluge Web API**.
 
-## Smart Cleanup
-
-Requirements: Python 3.8+ and Deluge Web API enabled/reachable.
-
-Example:
+Set your Deluge address and password:
 
 ```bash
 export DELUGE_URL="http://127.0.0.1:8112"
@@ -48,45 +44,49 @@ export DELUGE_PASSWORD="your-web-password"
 python3 deluge-smart-cleanup.py
 ```
 
-After checking dry-run output:
+That is a dry run. If the results look correct:
 
 ```bash
 python3 deluge-smart-cleanup.py --live
 ```
 
-Configuration:
+### Settings
 
-| Variable | Default | Meaning |
+| Variable | Default | What it does |
 | --- | --- | --- |
-| `DELUGE_URL` | `http://127.0.0.1:8112` | Deluge Web URL |
+| `DELUGE_URL` | `http://127.0.0.1:8112` | Deluge Web address |
 | `DELUGE_PASSWORD` | required | Deluge Web password |
-| `DELUGE_CLEANUP_STATE` | beside script | State JSON location |
-| `DELUGE_INACTIVE_DAYS` | `11` | Inactivity before an incomplete torrent qualifies |
-| `DELUGE_ACTIVITY_BPS` | `1024` | Download/upload rate considered activity |
-| `DELUGE_REMOVE_DATA` | `true` | Also delete download data in live mode |
+| `DELUGE_CLEANUP_STATE` | beside script | Where cleanup state is saved |
+| `DELUGE_INACTIVE_DAYS` | `11` | Days an incomplete torrent may stay inactive |
+| `DELUGE_ACTIVITY_BPS` | `1024` | Transfer rate treated as activity |
+| `DELUGE_REMOVE_DATA` | `true` | Delete downloaded data as well in live mode |
 
-### Scheduling
-
-Run it periodically, for example once per day. Keep the password in a protected file or environment rather than putting it in a public script.
+Run the script periodically, such as once per day. Keep real passwords and other credentials out of scripts you publish or share.
 
 ## AutoRemovePlus
 
-The tested setup uses **AutoRemovePlus 2.0.0 for Python 3.12**. AutoRemovePlus is third-party GPLv3 software; it is not authored by this project.
+This repository also includes a tested **AutoRemovePlus 2.0.0 Python 3.12** build.
 
-The tested retention rule was **264 hours = 11 days** of seed time for the Sonarr/Radarr download labels. Your tracker rules may require a different minimum, so configure the value for your own tracker before enabling removal.
+The older `.egg` was incompatible with the newer Deluge environment used during testing. That compatibility problem was fixed and the resulting build was tested successfully.
 
-AutoRemovePlus can remove both the torrent and its downloaded data after its configured rule is satisfied. Verify its settings carefully.
+AutoRemovePlus is **third-party GPLv3 software** and is not authored by this project. See `AUTOREMOVEPLUS.md` for attribution and build notes.
 
-See `AUTOREMOVEPLUS.md` for attribution and notes about the tested build.
+Our tested setup used **11 days (264 hours)** of seed time before completed downloads were removed. This is only an example: use the seeding requirements of your own tracker.
 
-## Deluge + Gluetun
+## Gluetun
 
-When using Gluetun, route Deluge through Gluetun's network namespace and expose Deluge's required ports through Gluetun. This keeps VPN networking separate from cleanup policy.
+If Deluge runs through **Gluetun**, keep Deluge in Gluetun's network namespace and expose the ports Deluge needs through Gluetun.
 
-This repository intentionally does not contain VPN credentials, provider-specific secrets or a copy/paste compose file pretending to fit every Docker/NAS environment.
+Smart Cleanup does not manage your VPN and does not contain VPN credentials or provider-specific configuration.
+
+A typical setup can look like:
+
+`Prowlarr → Sonarr/Radarr → Deluge → Gluetun`
+
+Only Deluge is required by the cleanup script.
 
 ## License
 
-The original code in this repository is MIT licensed.
+The Smart Cleanup code is **MIT licensed**.
 
-AutoRemovePlus is a separate third-party project licensed under GPLv3. Its license and attribution must be preserved independently.
+AutoRemovePlus is separate third-party software licensed under **GPLv3**. Its original attribution and license remain separate.
