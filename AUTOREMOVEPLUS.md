@@ -1,23 +1,25 @@
-# AutoRemovePlus notes
+# AutoRemovePlus
 
-The Deluge setup used while developing this project ran **AutoRemovePlus 2.0.0** built for **Python 3.12**. The existing AutoRemovePlus `.egg` was broken/incompatible with the newer Deluge environment used during testing; that compatibility issue was fixed and the resulting build was verified to load and work with that Deluge version.
+This repository includes a tested **AutoRemovePlus 2.0.0 build for Python 3.12**.
 
-AutoRemovePlus is third-party software. **MrRobot-88 does not claim authorship of AutoRemovePlus; the contribution here is the compatibility fix/build for the newer Deluge environment and testing that it works.** Metadata in the tested plugin identifies:
+The existing `.egg` was incompatible with the newer Deluge environment used during testing. That compatibility issue was fixed, and the resulting build was tested successfully.
 
-- Name: AutoRemovePlus
-- Version: 2.0.0
-- Author: Ervin Toth
-- Homepage: http://github.com/tote94
-- License: GPLv3
+## Credit and license
 
-The tested configuration used a seed-time rule of **264 hours (11 days)** for the download labels used by Sonarr and Radarr, with removal of downloaded data enabled after the rule was satisfied.
+AutoRemovePlus is third-party software. **MrRobot-88 does not claim authorship of AutoRemovePlus.** The contribution here is the compatibility fix/build and testing it with the newer Deluge environment.
 
-That is an example, **not a universal recommendation**. Private trackers have different seeding requirements.
+Original plugin metadata:
 
-## Why the binary .egg is not committed here yet
+- **Author:** Ervin Toth
+- **Homepage:** http://github.com/tote94
+- **License:** GPLv3
 
-The locally tested Python 3.12 build was inspected before publication. Because it is a modified/rebuilt third-party GPLv3 package, this repository does not publish that binary until its corresponding source, modification history, license text and reproducible build instructions are packaged together correctly.
+The tested `.egg` and its corresponding source are included under `autoremoveplus/`.
 
-This avoids distributing an opaque binary without the source/attribution material expected for a GPL release.
+## Tested setup
 
-The Smart Cleanup script does not require AutoRemovePlus.
+Our setup used a seed-time rule of **264 hours (11 days)** and removed the downloaded data after the rule was satisfied.
+
+That is an example, not a universal setting. Check the seeding rules of your own tracker before enabling automatic removal.
+
+AutoRemovePlus handles completed torrents. The Smart Cleanup script handles long-inactive **incomplete** torrents, so either can also be used without the other.
