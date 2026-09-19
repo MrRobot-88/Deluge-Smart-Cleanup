@@ -1,8 +1,8 @@
 # AutoRemovePlus notes
 
-The Deluge setup used while developing this project ran **AutoRemovePlus 2.0.0** built for **Python 3.12**.
+The Deluge setup used while developing this project ran **AutoRemovePlus 2.0.0** built for **Python 3.12**. The existing AutoRemovePlus `.egg` was broken/incompatible with the newer Deluge environment used during testing; that compatibility issue was fixed and the resulting build was verified to load and work with that Deluge version.
 
-AutoRemovePlus is third-party software. Metadata in the tested plugin identifies:
+AutoRemovePlus is third-party software. **MrRobot-88 does not claim authorship of AutoRemovePlus; the contribution here is the compatibility fix/build for the newer Deluge environment and testing that it works.** Metadata in the tested plugin identifies:
 
 - Name: AutoRemovePlus
 - Version: 2.0.0
