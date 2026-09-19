@@ -46,7 +46,7 @@ def main():
     args=ap.parse_args()
     if not PASSWORD:
         sys.exit("ERROR: DELUGE_PASSWORD is required")
-    rpc("auth.login",[PASSWORD])
+    if rpc("auth.login",[PASSWORD]) is not True:\n        sys.exit("ERROR: Deluge authentication failed")
     fields=["name","progress","state","download_payload_rate","upload_payload_rate","total_done"]
     torrents=rpc("web.update_ui",[fields,{}])["torrents"]
     st=load_state(); now=time.time(); seen=set()
